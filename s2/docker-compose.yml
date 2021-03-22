@@ -1,0 +1,40 @@
+version: "3.1"
+services:
+  db:
+    container_name: mysqldb
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: cisco
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+      - "33060:33060"
+    networks: 
+      net1:         
+        ipv4_address: 10.0.255.2
+
+  web_app:
+    container_name: notebookapp
+    image: jupyter/minimal-notebook
+    restart: always
+    depends_on:
+      - "db"
+    networks:
+      net1:
+        ipv4_address: 10.0.255.3
+    volumes:
+        - ./:/work
+    ports:
+       - 10000:8888
+
+
+volumes:
+  mysql-data:
+networks:
+      net1:
+         driver: bridge
+         ipam:
+             config:
+                 - subnet: 10.0.255.0/29
